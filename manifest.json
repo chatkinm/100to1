@@ -1,0 +1,24 @@
+{
+  "name": "Сто к одному — Pass & Play",
+  "short_name": "100 к 1",
+  "description": "Популярная командная телеигра на одном экране для вечеринок и игры с друзьями офлайн.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

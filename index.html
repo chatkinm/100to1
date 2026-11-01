@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сто к одному — Pass & Play</title>
+
+  <!-- Mobile-first Viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#060a14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- ================= 1. MENU SCREEN ================= -->
+    <section id="menu-screen" class="screen">
+      <div class="menu-container">
+        <div class="logo-wrap">
+          <span class="logo-badge">Телевикторина</span>
+          <h1 class="main-logo">СТО К ОДНОМУ</h1>
+          <p class="menu-subtitle">Популярная командная игра на одном экране</p>
+        </div>
+
+        <div class="menu-buttons">
+          <button id="btn-to-lobby" class="btn btn-primary btn-lg">🎮 Начать игру</button>
+          <button id="btn-to-editor" class="btn btn-secondary btn-lg">✏️ Конструктор игр</button>
+          <button id="btn-open-rules" class="btn btn-tertiary">📖 Как играть?</button>
+        </div>
+
+        <footer class="menu-footer">
+          <span class="badge badge-accent">⚡ Оффлайн-режим активен</span>
+          <button id="btn-toggle-sound" class="btn btn-sm btn-secondary" title="Вкл/Выкл звук">
+            <span id="sound-status-icon">🔊</span> Звук
+          </button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- ================= 2. LOBBY SCREEN ================= -->
+    <section id="lobby-screen" class="screen hidden">
+      <header class="screen-header">
+        <button class="btn btn-sm btn-secondary btn-to-menu">&larr; В меню</button>
+        <h2>Настройка игры</h2>
+        <div></div>
+      </header>
+
+      <div class="lobby-container">
+        <!-- Выбор пакета -->
+        <div class="card">
+          <div class="form-group">
+            <label>1. Выберите игру:</label>
+            <select id="lobby-pack-select" class="form-control">
+              <!-- Заполняется динамически -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Настройка команд -->
+        <div class="card">
+          <div class="form-group">
+            <label>2. Команды соперников:</label>
+            <div class="teams-inputs-grid">
+              <div>
+                <label style="font-size: 12px; margin-bottom: 4px;">Команда 1 (Слева)</label>
+                <input type="text" id="team1-name-input" class="form-control" value="Команда 1" maxlength="20">
+              </div>
+              <div>
+                <label style="font-size: 12px; margin-bottom: 4px;">Команда 2 (Справа)</label>
+                <input type="text" id="team2-name-input" class="form-control" value="Команда 2" maxlength="20">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-start-gameplay" class="btn btn-primary btn-lg" style="width: 100%;">
+          🚀 Поехали! Начать первый раунд
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 3. GAMEPLAY SCREEN ================= -->
+    <section id="game-screen" class="screen hidden">
+      <div class="game-container">
+        
+        <!-- HUD BAR: TEAM 1 | BANK | TEAM 2 -->
+        <header class="hud-bar">
+          <div id="team1-card" class="team-card active" title="Нажмите, чтобы передать ход этой команде">
+            <span class="active-indicator">ХОД</span>
+            <span id="team1-display-name" class="team-name">Команда 1</span>
+            <span id="team1-display-score" class="team-score">0</span>
+          </div>
+
+          <div class="bank-box">
+            <span class="bank-label">Банк раунда</span>
+            <span id="bank-display-amount" class="bank-amount">0</span>
+          </div>
+
+          <div id="team2-card" class="team-card" title="Нажмите, чтобы передать ход этой команде">
+            <span class="active-indicator">ХОД</span>
+            <span id="team2-display-name" class="team-name">Команда 2</span>
+            <span id="team2-display-score" class="team-score">0</span>
+          </div>
+        </header>
+
+        <!-- ROUND INFO & QUESTION -->
+        <div class="round-card">
+          <div class="round-meta-row">
+            <span id="round-name-badge" class="round-badge">РАУНД 1: ПРОСТАЯ ИГРА (x1)</span>
+            
+            <div class="strikes-container" title="Промахи активной команды">
+              <span class="strike-dot" id="strike-1">✕</span>
+              <span class="strike-dot" id="strike-2">✕</span>
+              <span class="strike-dot" id="strike-3">✕</span>
+            </div>
+          </div>
+          <h2 id="current-question-text" class="question-text">Загрузка вопроса...</h2>
+        </div>
+
+        <!-- MAIN SCOREBOARD (ТАБЛО) -->
+        <div class="board-wrapper">
+          <div id="main-scoreboard" class="sto-board">
+            <!-- 6 строк табло генерируются динамически -->
+          </div>
+        </div>
+
+        <!-- HOST CONTROLS BAR -->
+        <footer class="host-bar">
+          <div class="host-buttons-row">
+            <!-- Кнопка промаха -->
+            <button id="btn-strike" class="btn btn-strike btn-lg" title="Звук ошибки и +1 промах">
+              ❌ ПРОМАХ
+            </button>
+
+            <!-- Переключение активной команды -->
+            <button id="btn-switch-team" class="btn btn-secondary" title="Передать право ответа другой команде">
+              🔄 Сменить ход
+            </button>
+
+            <!-- Начисление банка -->
+            <button id="btn-award-team1" class="btn btn-primary" title="Отдать банк Команде 1">
+              🏆 Банк Команде 1
+            </button>
+            <button id="btn-award-team2" class="btn btn-primary" title="Отдать банк Команде 2">
+              🏆 Банк Команде 2
+            </button>
+
+            <!-- Открыть все -->
+            <button id="btn-reveal-all" class="btn btn-secondary" title="Показать зрителям все оставшиеся ответы">
+              👁️ Открыть всё
+            </button>
+
+            <!-- Следующий раунд -->
+            <button id="btn-next-round" class="btn btn-accent" title="Перейти к следующему раунду">
+              След. раунд ➡️
+            </button>
+          </div>
+
+          <!-- Дополнительные утилиты -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <button class="btn btn-sm btn-tertiary btn-to-menu">🚪 Выйти в меню</button>
+            <div style="display: flex; gap: 8px;">
+              <button id="btn-toggle-fullscreen" class="btn btn-sm btn-secondary">⛶ Экран</button>
+              <button id="btn-game-sound" class="btn btn-sm btn-secondary">🔊</button>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </section>
+
+    <!-- ================= 4. BIG GAME (СУПЕРИГРА) ================= -->
+    <section id="biggame-screen" class="screen hidden">
+      <header class="screen-header">
+        <button class="btn btn-sm btn-secondary btn-to-menu">&larr; В меню</button>
+        <h2>БОЛЬШАЯ ИГРА (СУПЕРИГРА)</h2>
+        <button id="btn-biggame-next" class="btn btn-sm btn-primary">Итоги ➡️</button>
+      </header>
+
+      <div class="lobby-container biggame-container">
+        <div class="biggame-header">
+          <div>
+            <span class="badge badge-accent" id="biggame-player-badge">ИГРОК 1 (15 СЕК)</span>
+            <h3 style="color: var(--color-gold); margin-top: 6px;">Цель: набрать 200 очков</h3>
+          </div>
+          <div class="timer-box">
+            <span id="biggame-timer-display" class="timer-digits">15</span>
+            <button id="btn-timer-toggle" class="btn btn-danger btn-sm">▶ СТАРТ</button>
+            <button id="btn-timer-reset" class="btn btn-secondary btn-sm">↺</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 12px;">
+          <table class="biggame-table">
+            <thead>
+              <tr style="color: var(--color-text-muted); font-size: 13px; text-align: left;">
+                <th>Вопрос</th>
+                <th>Игрок 1</th>
+                <th>Игрок 2</th>
+              </tr>
+            </thead>
+            <tbody id="biggame-tbody">
+              <!-- Генерируется динамически -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 700;">Сумма баллов финалистов:</span>
+          <span id="biggame-total-score" style="font-family: var(--font-display); font-size: 36px; font-weight: 900; color: var(--color-gold);">0 / 200</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 5. GAME OVER / VICTORY SCREEN ================= -->
+    <section id="gameover-screen" class="screen hidden">
+      <div class="menu-container">
+        <span class="logo-badge" style="background: var(--color-success); color: #fff;">Игра окончена</span>
+        <h1 id="winner-title" class="main-logo" style="margin-top: 10px;">ПОБЕДА!</h1>
+        <p id="winner-subtitle" class="menu-subtitle" style="margin-bottom: 24px;">Команда набрала больше всех баллов</p>
+
+        <div class="card" style="width: 100%; max-width: 440px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-around; align-items: center;">
+            <div style="text-align: center;">
+              <h4 id="final-team1-name" style="color: var(--color-cyan); margin-bottom: 6px;">Команда 1</h4>
+              <span id="final-team1-score" style="font-size: 36px; font-weight: 900;">0</span>
+            </div>
+            <div style="font-size: 24px; color: var(--color-gold); font-weight: 900;">VS</div>
+            <div style="text-align: center;">
+              <h4 id="final-team2-name" style="color: var(--color-cyan); margin-bottom: 6px;">Команда 2</h4>
+              <span id="final-team2-score" style="font-size: 36px; font-weight: 900;">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-buttons">
+          <button id="btn-play-again" class="btn btn-primary btn-lg">🔄 Сыграть еще раз</button>
+          <button class="btn btn-secondary btn-to-menu">🚪 В главное меню</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 6. EDITOR SCREEN ================= -->
+    <section id="editor-screen" class="screen hidden">
+      <header class="screen-header">
+        <button class="btn btn-sm btn-secondary btn-to-menu">&larr; В меню</button>
+        <h2>Конструктор вопросов</h2>
+        <button id="btn-create-pack" class="btn btn-sm btn-primary">+ Создать игру</button>
+      </header>
+
+      <div class="editor-container">
+        <!-- Список паков -->
+        <div id="editor-list-view">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>Библиотека игр</h3>
+            <label class="btn btn-sm btn-secondary" style="cursor: pointer;">
+              📤 Загрузить JSON
+              <input type="file" id="input-import-pack" accept=".json" style="display: none;">
+            </label>
+          </div>
+          <div id="editor-packs-list">
+            <!-- Список карточек пакетов -->
+          </div>
+        </div>
+
+        <!-- Форма редактирования пака -->
+        <div id="editor-form-view" class="hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <button id="btn-cancel-editor" class="btn btn-sm btn-secondary">&larr; Назад к списку</button>
+            <button id="btn-save-pack" class="btn btn-sm btn-primary">💾 Сохранить игру</button>
+          </div>
+
+          <div class="card">
+            <div class="form-group">
+              <label>Название игры / пакета:</label>
+              <input type="text" id="editor-pack-name" class="form-control" placeholder="Например: Новогодний выпуск">
+            </div>
+            <div class="form-group">
+              <label>Описание:</label>
+              <input type="text" id="editor-pack-desc" class="form-control" placeholder="Краткое описание игры">
+            </div>
+          </div>
+
+          <div id="editor-rounds-container">
+            <!-- Раунды генерируются динамически -->
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;">
+            <button id="btn-add-regular-round" class="btn btn-secondary">+ Добавить обычный раунд</button>
+            <button id="btn-add-reverse-round" class="btn btn-secondary">+ Раунд "Игра наоборот"</button>
+            <button id="btn-add-final-round" class="btn btn-secondary">+ Раунд "Большая игра"</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RULES MODAL ================= -->
+    <div id="rules-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Правила игры «Сто к одному»</h3>
+          <button id="btn-close-rules" class="btn btn-sm btn-icon btn-secondary">✕</button>
+        </div>
+        <ul class="rules-list">
+          <li><strong>Суть игры:</strong> Угадать наиболее популярные ответы людей на улицах или в опросах. Чем популярнее ответ — тем больше очков он приносит на табло!</li>
+          <li><strong>Раунд 1 (Простая игра):</strong> Очки за каждый отгаданный ответ суммируются с множителем <strong>x1</strong>.</li>
+          <li><strong>Раунд 2 (Двойная игра):</strong> Множитель очков удваивается: <strong>x2</strong>.</li>
+          <li><strong>Раунд 3 (Тройная игра):</strong> Множитель утраивается: <strong>x3</strong>.</li>
+          <li><strong>Раунд 4 (Игра наоборот):</strong> Задача — назвать самый редкий (нижний) ответ опроса! Чем непопулярнее ответ, тем больше очков он даёт (до 240 баллов).</li>
+          <li><strong>Промахи (❌):</strong> Если команда предлагает ответ, которого нет на табло, она получает штрафной крест. При <strong>3 промахах</strong> право ответа и шанс украсть накопленный банк раунда переходит к соперникам!</li>
+          <li><strong>Большая игра (Суперигра):</strong> 2 игрока команды-лидера отвечают на 5 блиц-вопросов за 15 и 20 секунд. Если вместе они набирают <strong>200 очков</strong> — команда становится абсолютным чемпионом!</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ================= GIANT STRIKE OVERLAY ================= -->
+    <div id="strike-overlay">
+      <div class="giant-crosses-wrap" id="giant-crosses-wrap">
+        <span class="giant-cross">✕</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main JavaScript App Entry -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
