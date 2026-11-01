@@ -15,6 +15,10 @@ export class GameEngine {
     this.activeTeamIndex = 0; // 0 или 1
     this.currentRoundIdx = 0;
     
+    // Режим правил
+    this.rulesMode = 'classic'; // 'classic' или 'simple'
+    this.enableBigGame = true;
+    
     // Текущий раунд
     this.roundData = null;
     this.answersState = []; // [{ text, points, revealed: boolean }]
@@ -37,6 +41,8 @@ export class GameEngine {
   startNewGame(pack, options = {}) {
     this.pack = pack;
     this.mode = options.mode || 'teams';
+    this.rulesMode = options.rulesMode || 'classic';
+    this.enableBigGame = options.enableBigGame !== false;
     
     if (this.mode === 'teams') {
       this.teams = [
@@ -64,8 +70,14 @@ export class GameEngine {
       return;
     }
 
-    this.currentRoundIdx = idx;
     const round = this.pack.rounds[idx];
+    if (round.isFinal && !this.enableBigGame) {
+      // Если Большая игра отключена в настройках
+      if (this.onGameOver) this.onGameOver();
+      return;
+    }
+
+    this.currentRoundIdx = idx;
     this.roundData = round;
     this.roundBank = 0;
     this.strikes = 0;
@@ -198,8 +210,14 @@ export class GameEngine {
    * Переход к следующему раунду
    */
   nextRound() {
-    if (this.currentRoundIdx + 1 < this.pack.rounds.length) {
-      this.loadRound(this.currentRoundIdx + 1);
+    const nextIdx = this.currentRoundIdx + 1;
+    if (nextIdx < this.pack.rounds.length) {
+      const nextRoundData = this.pack.rounds[nextIdx];
+      if (nextRoundData.isFinal && !this.enableBigGame) {
+        if (this.onGameOver) this.onGameOver();
+      } else {
+        this.loadRound(nextIdx);
+      }
     } else {
       if (this.onGameOver) this.onGameOver();
     }

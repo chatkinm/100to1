@@ -87,8 +87,39 @@
           </div>
         </div>
 
+        <!-- Режим игры и правила -->
+        <div class="card">
+          <div class="form-group">
+            <label>3. Режим игры:</label>
+            <div class="mode-select-grid">
+              <label class="radio-card active" id="mode-card-classic">
+                <input type="radio" name="game-rules-mode" value="classic" checked>
+                <div class="radio-card-content">
+                  <div class="radio-title">⭐ Классический (Телешоу)</div>
+                  <div class="radio-desc">3 промаха, банк раунда, борьба за перехват хода при ошибках и Большая игра в финале.</div>
+                </div>
+              </label>
+
+              <label class="radio-card" id="mode-card-simple">
+                <input type="radio" name="game-rules-mode" value="simple">
+                <div class="radio-card-content">
+                  <div class="radio-title">🎈 Простой (Вечеринка / Семья)</div>
+                  <div class="radio-desc">Максимально простой: без строгих правил и штрафов! Открывайте ответы, листайте вопросы вперед/назад, начисляйте баллы как удобно.</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px; margin-bottom: 0;">
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--color-text-main); font-size: 14px;">
+              <span>Включить финальную Суперигру (Большую игру):</span>
+              <input type="checkbox" id="setting-enable-biggame" checked style="width: 20px; height: 20px; accent-color: var(--color-gold); cursor: pointer;">
+            </label>
+          </div>
+        </div>
+
         <button id="btn-start-gameplay" class="btn btn-primary btn-lg" style="width: 100%;">
-          🚀 Поехали! Начать первый раунд
+          🚀 Поехали! Начать игру
         </button>
       </div>
     </section>
@@ -103,6 +134,10 @@
             <span class="active-indicator">ХОД</span>
             <span id="team1-display-name" class="team-name">Команда 1</span>
             <span id="team1-display-score" class="team-score">0</span>
+            <div class="score-adjust-btns">
+              <button class="btn-adjust" id="btn-adjust-sub-t1" title="Отнять 10 очков">-10</button>
+              <button class="btn-adjust" id="btn-adjust-add-t1" title="Добавить 10 очков">+10</button>
+            </div>
           </div>
 
           <div class="bank-box">
@@ -114,15 +149,22 @@
             <span class="active-indicator">ХОД</span>
             <span id="team2-display-name" class="team-name">Команда 2</span>
             <span id="team2-display-score" class="team-score">0</span>
+            <div class="score-adjust-btns">
+              <button class="btn-adjust" id="btn-adjust-sub-t2" title="Отнять 10 очков">-10</button>
+              <button class="btn-adjust" id="btn-adjust-add-t2" title="Добавить 10 очков">+10</button>
+            </div>
           </div>
         </header>
 
         <!-- ROUND INFO & QUESTION -->
         <div class="round-card">
           <div class="round-meta-row">
-            <span id="round-name-badge" class="round-badge">РАУНД 1: ПРОСТАЯ ИГРА (x1)</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="simple-mode-tag" class="badge badge-accent hidden">🎈 Простой режим</span>
+              <span id="round-name-badge" class="round-badge">РАУНД 1: ПРОСТАЯ ИГРА (x1)</span>
+            </div>
             
-            <div class="strikes-container" title="Промахи активной команды">
+            <div class="strikes-container" id="strikes-box" title="Промахи активной команды">
               <span class="strike-dot" id="strike-1">✕</span>
               <span class="strike-dot" id="strike-2">✕</span>
               <span class="strike-dot" id="strike-3">✕</span>
@@ -164,9 +206,14 @@
               👁️ Открыть всё
             </button>
 
+            <!-- Предыдущий раунд -->
+            <button id="btn-prev-round" class="btn btn-secondary" title="Вернуться к предыдущему вопросу">
+              ⬅️ Пред.
+            </button>
+
             <!-- Следующий раунд -->
             <button id="btn-next-round" class="btn btn-accent" title="Перейти к следующему раунду">
-              След. раунд ➡️
+              След. ➡️
             </button>
           </div>
 

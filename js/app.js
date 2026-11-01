@@ -83,6 +83,15 @@ function renderGameUI() {
   // 3. Метаданные раунда и вопрос
   const roundBadge = document.getElementById('round-name-badge');
   const questionEl = document.getElementById('current-question-text');
+  const simpleTag = document.getElementById('simple-mode-tag');
+
+  if (simpleTag) {
+    if (game.rulesMode === 'simple') {
+      simpleTag.classList.remove('hidden');
+    } else {
+      simpleTag.classList.add('hidden');
+    }
+  }
 
   let multiplierText = `(x${game.roundData.multiplier || 1})`;
   if (game.roundData.isReverse) multiplierText = '(ИГРА НАОБОРОТ)';
@@ -92,6 +101,13 @@ function renderGameUI() {
   }
   if (questionEl) {
     questionEl.textContent = game.roundData.question || 'Вопрос не задан';
+  }
+
+  // Обновление состояния кнопки "Пред. раунд"
+  const prevBtn = document.getElementById('btn-prev-round');
+  if (prevBtn) {
+    prevBtn.style.opacity = game.currentRoundIdx === 0 ? '0.4' : '1';
+    prevBtn.disabled = game.currentRoundIdx === 0;
   }
 
   // 4. Промахи (крестики)
@@ -421,6 +437,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 8.5. Переключатель карточек режима в Лобби
+  const modeCards = [document.getElementById('mode-card-classic'), document.getElementById('mode-card-simple')];
+  modeCards.forEach(card => {
+    if (card) {
+      card.addEventListener('click', () => {
+        modeCards.forEach(c => c?.classList.remove('active'));
+        card.classList.add('active');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      });
+    }
+  });
+
   // 9. Старт игры из Лобби
   const btnStartGame = document.getElementById('btn-start-gameplay');
   if (btnStartGame) {
@@ -432,7 +461,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const t1 = document.getElementById('team1-name-input')?.value || 'Команда 1';
       const t2 = document.getElementById('team2-name-input')?.value || 'Команда 2';
 
-      game.startNewGame(pack, { team1Name: t1, team2Name: t2 });
+      const rulesMode = document.querySelector('input[name="game-rules-mode"]:checked')?.value || 'classic';
+      const enableBigGame = document.getElementById('setting-enable-biggame')?.checked !== false;
+
+      game.startNewGame(pack, {
+        team1Name: t1,
+        team2Name: t2,
+        rulesMode,
+        enableBigGame
+      });
       renderGameUI();
     });
   }
@@ -440,12 +477,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 10. Кнопки игрового процесса
   document.getElementById('btn-strike')?.addEventListener('click', () => game.addStrike());
   document.getElementById('btn-switch-team')?.addEventListener('click', () => game.toggleActiveTeam());
-  document.getElementById('team1-card')?.addEventListener('click', () => game.setActiveTeam(0));
-  document.getElementById('team2-card')?.addEventListener('click', () => game.setActiveTeam(1));
+  document.getElementById('team1-card')?.addEventListener('click', (e) => {
+    if (e.target.closest('.btn-adjust')) return;
+    game.setActiveTeam(0);
+  });
+  document.getElementById('team2-card')?.addEventListener('click', (e) => {
+    if (e.target.closest('.btn-adjust')) return;
+    game.setActiveTeam(1);
+  });
+
+  // Быстрая корректировка очков
+  document.getElementById('btn-adjust-sub-t1')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    game.adjustScore(0, -10);
+  });
+  document.getElementById('btn-adjust-add-t1')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    game.adjustScore(0, 10);
+  });
+  document.getElementById('btn-adjust-sub-t2')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    game.adjustScore(1, -10);
+  });
+  document.getElementById('btn-adjust-add-t2')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    game.adjustScore(1, 10);
+  });
 
   document.getElementById('btn-award-team1')?.addEventListener('click', () => game.awardBankToTeam(0));
   document.getElementById('btn-award-team2')?.addEventListener('click', () => game.awardBankToTeam(1));
   document.getElementById('btn-reveal-all')?.addEventListener('click', () => game.revealAll());
+  document.getElementById('btn-prev-round')?.addEventListener('click', () => game.prevRound());
   document.getElementById('btn-next-round')?.addEventListener('click', () => game.nextRound());
 
   // Большая игра кнопки

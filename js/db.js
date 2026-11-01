@@ -42,18 +42,20 @@ export async function initDefaultPacks() {
   }
 
   // 2. Праздничный пакет "День рождения брата 14 лет"
-  if (!packs.some(p => p.id === BDAY_PACK_ID)) {
-    try {
-      const response = await fetch('./assets/birthday_14_pack.json');
-      if (response.ok) {
-        const bdayPack = await response.json();
-        // Ставим праздничный пак в начало списка для быстрого выбора
+  try {
+    const response = await fetch('./assets/birthday_14_pack.json');
+    if (response.ok) {
+      const bdayPack = await response.json();
+      const existingIdx = packs.findIndex(p => p.id === BDAY_PACK_ID);
+      if (existingIdx !== -1) {
+        packs[existingIdx] = bdayPack;
+      } else {
         packs.unshift(bdayPack);
-        updated = true;
       }
-    } catch (err) {
-      console.warn('[DB] Не удалось загрузить assets/birthday_14_pack.json:', err);
+      updated = true;
     }
+  } catch (err) {
+    console.warn('[DB] Не удалось загрузить assets/birthday_14_pack.json:', err);
   }
 
   if (updated) {
