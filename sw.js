@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sto-k-odnomu-v1';
+const CACHE_NAME = 'sto-k-odnomu-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './js/sw-register.js',
   './js/app.js',
   './assets/default_pack.json',
+  './assets/birthday_14_pack.json',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png'
 ];

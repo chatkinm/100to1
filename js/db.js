@@ -4,6 +4,7 @@
 
 const STORAGE_KEY = 'sto_k_odnomu_packs';
 export const DEFAULT_PACK_ID = 'sto-k-odnomu-default-v1';
+export const BDAY_PACK_ID = 'sto-k-odnomu-bday-14';
 
 /**
  * Получить список всех пакетов
@@ -20,24 +21,44 @@ export function getPacks() {
 }
 
 /**
- * Загрузить дефолтный пакет, если его еще нет
+ * Загрузить встроенные пакеты, если их еще нет
  */
 export async function initDefaultPacks() {
   const packs = getPacks();
-  const hasDefault = packs.some(p => p.id === DEFAULT_PACK_ID);
+  let updated = false;
 
-  if (!hasDefault) {
+  // 1. Базовый демо-пакет
+  if (!packs.some(p => p.id === DEFAULT_PACK_ID)) {
     try {
       const response = await fetch('./assets/default_pack.json');
       if (response.ok) {
         const defaultPack = await response.json();
-        packs.unshift(defaultPack);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(packs));
-        console.log('[DB] Загружен базовый пакет "Сто к одному".');
+        packs.push(defaultPack);
+        updated = true;
       }
     } catch (err) {
       console.warn('[DB] Не удалось загрузить assets/default_pack.json:', err);
     }
+  }
+
+  // 2. Праздничный пакет "День рождения брата 14 лет"
+  if (!packs.some(p => p.id === BDAY_PACK_ID)) {
+    try {
+      const response = await fetch('./assets/birthday_14_pack.json');
+      if (response.ok) {
+        const bdayPack = await response.json();
+        // Ставим праздничный пак в начало списка для быстрого выбора
+        packs.unshift(bdayPack);
+        updated = true;
+      }
+    } catch (err) {
+      console.warn('[DB] Не удалось загрузить assets/birthday_14_pack.json:', err);
+    }
+  }
+
+  if (updated) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(packs));
+    console.log('[DB] Встроенные пакеты успешно инициализированы.');
   }
 }
 
